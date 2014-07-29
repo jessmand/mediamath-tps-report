@@ -1,0 +1,10 @@
+<div class="form-group">
+<p><%= questionText %></p>
+<% var count=0 %>
+<% _.each(choices, function(option) { %>
+<label class="radio-inline">
+	<input type="radio" name="<%= questionText %>" id="choice_<%= _id %>-<%= count %>" value="<%= option %>"> <%= option %>
+</label>
+<% count++ %>
+<% }); %>
+</div>
