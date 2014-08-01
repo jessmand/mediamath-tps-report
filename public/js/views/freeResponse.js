@@ -7,7 +7,7 @@ window.FreeResponseView = Backbone.View.extend({
 
     render: function () {
         var question = this.model;
-        $(this.el).html(this.template(question.toJSON()));
+        $(this.el).html(this.template({question:question}));
 
         return this;
     }

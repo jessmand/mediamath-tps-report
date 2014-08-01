@@ -1,9 +1,9 @@
 <div class="form-group">
-<p><%= questionText %></p>
+<p><%= question.get("questionText") %></p>
 <% var count=0 %>
-<% _.each(choices, function(option) { %>
+<% _.each(question.get("choices"), function(option) { %>
 <label class="radio-inline">
-	<input type="radio" name="<%= questionText %>" id="choice_<%= _id %>-<%= count %>" value="<%= option %>"> <%= option %>
+	<input type="radio" name="<%= question.get('questionText') %>" id="choice_<%= question.get('_id') %>-<%= count %>" value="<%= option %>"> <%= option %>
 </label>
 <% count++ %>
 <% }); %>

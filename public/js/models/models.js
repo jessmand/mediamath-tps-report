@@ -79,21 +79,26 @@ window.Superlative = Backbone.Model.extend({
 
     idAttribute: "_id",
 
-    parse: function(response) {
-        console.log("parsing superlative");
-        response.responses = new PersonCollection(response.responses);
-        return response;
-    },
-
     defaults: {
         _id: null,
-        responses: new PersonCollection()
+        responses: [],
+        used: false
     }
 });
 
 window.SuperlativeCollection = Backbone.Collection.extend({
     model: Superlative,
-    url: "/superlatives"
+    url: "/superlatives",
+
+    getUnusedSuperlatives: function() {
+        var unusedSuperlatives = new SuperlativeCollection();
+        this.each( function(superlative) {
+            if (!superlative.get("used")) {
+                unusedSuperlatives.add(superlative);
+            }
+        });
+        return unusedSuperlatives;
+    }
 });
 
 window.Sprint = Backbone.Model.extend({
@@ -105,7 +110,47 @@ window.Sprint = Backbone.Model.extend({
     idAttribute: "_id",
 
     performAnalysis: function() {
-        var responseRate, averageRole, averageTeam, averageCompany, averageProduct;
+        var numResponses = this.get("responses").length;
+        this.set({numberOfResponses:numResponses});
+        var responseRate = numResponses/this.get("numberOfPeople");
+        this.set({responseRate:responseRate});
+        var questionAnswers = {};
+        this.get("responses").each(function(response) {
+            var answers = response.get("answers");
+            for (var i=0; i<answers.length; i++) {
+                if (answers[i].question in questionAnswers) {
+                    if (answers[i].questionType == "multipleChoice") {
+                        questionAnswers[answers[i].question] += parseInt(answers[i].response)/numResponses;
+                    } /*else if (answers[i].questionType == "freeResponse") {
+                        questionAnswers[answers[i].question].push(answers[i].response);
+                    }*/
+                } else {
+                    if (answers[i].questionType == "multipleChoice") {
+                        questionAnswers[answers[i].question] = parseInt(answers[i].response)/numResponses;
+                    } /*else if (answers[i].questionType == "freeResponse") {
+                        questionAnswers[answers[i].question] = [answers[i].response];
+                    }*/
+                }
+            }
+        });
+        this.set({questionAnswers:questionAnswers});
+        return Backbone.sync("update", this);
+    },
+
+    pullSurveyQuestions: function() {
+        var self = this;
+        if (this.get("questions") === undefined) {
+            var questionList = new QuestionCollection();
+            return questionList.fetch().then(function() {
+                var questions = [];
+                questionList.each(function(question) {
+                    questions.push(question.get("_id"));
+                });
+                self.set({"questions":questions});
+            });
+        } else {
+            return $.Deferred;
+        }
     },
 
     pullSuperlatives: function() {
@@ -114,15 +159,19 @@ window.Sprint = Backbone.Model.extend({
             var superlativeOptions = new SuperlativeCollection();
             var self = this;
             var deferred = superlativeOptions.fetch().then(function () {
-                    if (superlativeOptions.length == 0) {
+                var unusedSuperlativeOptions = superlativeOptions.getUnusedSuperlatives();
+                    if (unusedSuperlativeOptions.length == 0) {
                         var superlative1 = new Superlative({name: "Most likely to be the candy man"});
+                        superlativeOptions.add(superlative1);
                         return Backbone.sync("create", superlative1).then(function () {
                             var superlative2 = new Superlative({name: "Most violent"});
+                            superlativeOptions.add(superlative2);
                             return Backbone.sync("create", superlative2).then(function () {
                                 var superlative3 = new Superlative({name: "Best coder"});
-                                return Backbone.sync("create", superlative3).then(function () {
-                                        return superlativeOptions.fetch();
-                                    }, null);
+                                superlativeOptions.add(superlative3);
+                                return Backbone.sync("create", superlative3).then(function() {
+                                    return superlativeOptions.fetch();
+                                }, null);
                             }, null);
                         }, null);
                     } else {
@@ -131,19 +180,28 @@ window.Sprint = Backbone.Model.extend({
                 }, null);
 
             return deferred.then(function () {
-                for (var i = superlativeOptions.length - 1; i > superlativeOptions.length - 4; i--) {
-                    if (i < 0) {
+                var deferredUpdate;
+                var unusedSuperlativeOptions = superlativeOptions.getUnusedSuperlatives();
+                for (var i = 0; i < 3; i++) {
+                    if (unusedSuperlativeOptions.length == 0) {
                         console.log("Not enough superlatives in database to add 3");
                         break;
                     }
-                    var superlative = superlativeOptions.at(i);
+                    var superlative = unusedSuperlativeOptions.pop();
                     chosenSuperlativeOptions.add(superlative);
-                     superlative.destroy({success: function() {
-                     console.log("Superlative successfully deleted");
-                     }});
+                     var updateSuperlative = function() {
+                         superlative.set({used:true});
+                         return Backbone.sync("update", superlative);
+                     };
+                    if (deferredUpdate === undefined) {
+                        deferredUpdate = updateSuperlative();
+                    } else {
+                        deferredUpdate = deferredUpdate.then(updateSuperlative());
+                    }
+
                 }
                 self.set({superlatives: chosenSuperlativeOptions});
-                return this;
+                return deferredUpdate;
 
             }, null);
         } else {
@@ -156,34 +214,76 @@ window.Sprint = Backbone.Model.extend({
         this.get("responses").add(response);
     },
 
+    responsesToHistory: function() {
+        var superlatives = this.get("superlatives");
+        var deferred;
+        superlatives.each( function(superlative) {
+            var votes = {};
+            _.each(superlative.get("responses"), function(person) {
+                if (person in votes) {
+                    votes[person] += 1
+                } else {
+                    votes[person] = 1;
+                }
+            });
+            var winner;
+            var maxVotes = 0;
+            for (var key in votes) {
+                if (votes[key]>maxVotes) {
+                    winner = key;
+                    maxVotes = votes[key]
+                }
+            }
+            var history = new History({person: winner, superlative:superlative.get("name")});
+            if (deferred === undefined) {
+                deferred = Backbone.sync("create", history);
+            } else {
+                deferred.then(function() {
+                    return Backbone.sync("create", history);
+                }, null);
+            }
+
+        });
+        return deferred;
+    },
+
     deactivate: function() {
         this.set({active: false});
-        this.performAnalysis();
+        var self = this;
+        return this.performAnalysis().then(function() {
+            return self.responsesToHistory();
+        }, null);
+
     },
 
     activate: function() {
         this.set({active:true});
     },
 
-    constructor: function(arguments) {
+    initialize: function() {
+        var self = this;
         this.deferred = this.pullSuperlatives();
-        this.set({endDate: this.calculateEndDate(arguments[0].oldEndDate)});
-        delete arguments[0].oldEndDate;
-        this.set({beginDate: this.calculateBeginDate(arguments[0].oldBeginDate)});
-        delete arguments[0].oldBeginDate;
-        Backbone.Model.apply(this, arguments);
+        this.deferred = this.deferred.then(function() {
+            return self.pullSurveyQuestions();
+        }, null);
+        if (this.get("oldEndDate") !== undefined) {
+            this.calculateBeginDate();
+            this.calculateEndDate();
+        }
     },
 
-    calculateEndDate: function(oldEndDate) {
-        var date = new Date(oldEndDate.getTime());
+    calculateEndDate: function() {
+        var date = new Date(this.get("oldEndDate").getTime());
         date.setDate(date.getDate()+14);
-        return date;
+        this.set({endDate:date});
+        this.unset("oldEndDate");
     },
 
     calculateBeginDate: function(oldBeginDate) {
-        var date = new Date(oldBeginDate.getTime());
+        var date = new Date(this.get("oldBeginDate").getTime());
         date.setDate(date.getDate()+14);
-        return date;
+        this.set({beginDate:date});
+        this.unset("oldBeginDate");
     },
 
     parse: function(response) {
@@ -198,7 +298,8 @@ window.Sprint = Backbone.Model.extend({
     defaults: {
         _id: null,
         active: false,
-        responses: new ResponseCollection()
+        responses: new ResponseCollection(),
+        numberOfPeople: 15
     }
 });
 
@@ -215,7 +316,9 @@ window.SprintCollection = Backbone.Collection.extend({
         if (currentSprint.get("active")) {
             return currentSprint;
         } else {
-            return new Error("Survey not currently open");
+            //TODO: changed for testing purposes
+            return currentSprint;
+            //return new Error("Survey not currently open");
         }
     },
 

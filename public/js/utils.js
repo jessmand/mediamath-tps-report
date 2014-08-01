@@ -22,8 +22,7 @@ window.utils = {
         var today = new Date();
 
         var sprintCollection = new SprintCollection();
-        sprintCollection.fetch().then(function () {
-
+        return sprintCollection.fetch().then(function () {
             if (sprintCollection.length == 0) {
                 if (today.getDay() == 5) {
                     var endDate = new Date();
@@ -31,25 +30,32 @@ window.utils = {
                     var beginDate = new Date();
                     beginDate.setHours(9,0,0,0);
                     var newSprint = new Sprint({sprintNumber: 1, oldEndDate: endDate, oldBeginDate: beginDate});
-                    newSprint.deferred.then(function () {
-                        return newSprint.save();
+                    return newSprint.deferred.then(function () {
+                        return Backbone.sync("create", newSprint);
                     }, null)
+                } else {
+                    return $.Deferred;
                 }
 
             } else {
                 var lastSprint = sprintCollection.getLastSprint();
                 if (today<lastSprint.get("endDate") && today>lastSprint.get("beginDate")) {
                     lastSprint.activate();
+                    return $.Deferred;
                 } else if (today>lastSprint.get("endDate") && lastSprint.get("active")) {
-                    lastSprint.deactivate();
-                    var newSprint = new Sprint({
-                        sprintNumber:sprintCollection.getNextSprintNumber(),
-                        oldEndDate: lastSprint.get("endDate"),
-                        oldBeginDate: lastSprint.get("beginDate")
+                    return lastSprint.deactivate().then(function() {
+                        var newSprint = new Sprint({
+                            sprintNumber: sprintCollection.getNextSprintNumber(),
+                            oldEndDate: lastSprint.get("endDate"),
+                            oldBeginDate: lastSprint.get("beginDate")
+                        });
+                        return newSprint.deferred.then(function () {
+                            return Backbone.sync("create", newSprint);
+                        }, null)
                     });
-                    newSprint.deferred.then(function () {
-                        return newSprint.save();
-                    }, null)
+
+                } else {
+                    return $.Deferred;
                 }
             }
         }, null);

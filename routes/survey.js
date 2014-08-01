@@ -15,7 +15,6 @@ db.open(function(err, db) {
 });
 
 exports.getQuestions = function(req, res) {
-    console.log(req);
     db.collection('questions', function(err, collection) {
         collection.find().toArray(function(err, items) {
             console.log(items);
@@ -91,6 +90,7 @@ exports.getSprint = function(req, res) {
 exports.getSprints = function(req, res) {
     db.collection('sprints', function(err, collection) {
         collection.find().toArray(function(err, items) {
+            console.log('Success: ' + JSON.stringify(items));
             res.send(items);
         });
     });
@@ -166,6 +166,25 @@ exports.deleteSuperlative = function(req, res) {
             } else {
                 console.log('' + result + ' document(s) deleted');
                 res.send(req.body);
+            }
+        });
+    });
+};
+
+exports.updateSuperlative = function(req, res) {
+    var id = req.params.id;
+    var superlative = req.body;
+    delete superlative._id;
+    console.log('Updating superlative: ' + id);
+    console.log(JSON.stringify(superlative));
+    db.collection('superlatives', function(err, collection) {
+        collection.update({'_id':new BSON.ObjectID(id)}, superlative, {safe:true}, function(err, result) {
+            if (err) {
+                console.log('Error updating superlative: ' + err);
+                res.send({'error':'An error has occurred'});
+            } else {
+                console.log('' + result + ' document(s) updated');
+                res.send(superlative);
             }
         });
     });

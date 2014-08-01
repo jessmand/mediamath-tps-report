@@ -22,30 +22,33 @@ var AppRouter = Backbone.Router.extend({
     },
 
     stats: function() {
-        utils.checkForUpdates();
-        var sprintList = new SprintCollection();
-        sprintList.fetch({success: function(){
-            $("#content").html(new StatsView({model: sprintList}).el);
-        }});
+        utils.checkForUpdates().then(function() {
+            var sprintList = new SprintCollection();
+            sprintList.fetch({success: function () {
+                $("#content").html(new StatsView({model: sprintList}).el);
+            }});
+        });
         this.headerView.selectMenuItem('sprints-menu');
     },
 
     superlatives: function() {
-        utils.checkForUpdates();
-        var HistoryList = new HistoryCollection();
-        HistoryList.fetch({success: function(){
-            $("#content").html(new SuperlativesView({model: HistoryList}).el);
-        }});
+        utils.checkForUpdates().then(function() {
+            var HistoryList = new HistoryCollection();
+            return HistoryList.fetch({success: function () {
+                $("#content").html(new SuperlativesView({model: HistoryList}).el);
+            }});
+        });
         this.headerView.selectMenuItem('superlatives-menu');
     },
 
     survey: function () {
-        utils.checkForUpdates();
-        var sprintList = new SprintCollection();
-        sprintList.fetch().then(function() {
-            var currentSprint = sprintList.getCurrentSprint();
-            $("#content").html(new SurveyView({sprint: currentSprint}).el);
-        }, null);
+        utils.checkForUpdates().then(function() {
+            var sprintList = new SprintCollection();
+            return sprintList.fetch().then(function () {
+                var currentSprint = sprintList.getCurrentSprint();
+                $("#content").html(new SurveyView({sprint: currentSprint}).el);
+            }, null);
+        });
         this.headerView.selectMenuItem('survey-menu');
     },
 
@@ -59,7 +62,7 @@ var AppRouter = Backbone.Router.extend({
 
 });
 
-utils.loadTemplate(['HomeView', 'HeaderView', 'SprintView', 'StatsView', 'SurveyView', 'SuperlativesView', 'MultipleChoiceView', 'FreeResponseView', 'VoteView'], function() {
+utils.loadTemplate(['HomeView', 'HeaderView', 'SprintView', 'StatsView', 'SurveyView', 'SuperlativesView', 'MultipleChoiceView', 'FreeResponseView', 'VoteView', 'ChartView'], function() {
     app = new AppRouter();
     Backbone.history.start();
 });

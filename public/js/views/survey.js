@@ -9,7 +9,10 @@ window.SurveyView = Backbone.View.extend({
         var self = this;
         var questionList = new QuestionCollection();
         questionList.fetch({success: function(){
-            self.questions = questionList;
+            self.questions = new QuestionCollection();
+            _.each(self.sprint.get("questions"), function(id) {
+                self.questions.add(questionList.get(id));
+            });
             var people = new PersonCollection();
             people.fetch({success: function(){
                 self.people = people;
@@ -69,12 +72,11 @@ window.SurveyView = Backbone.View.extend({
 
         for (var i=0; i<this.answers.length; i++) {
             if (this.answers[i].questionType == "multipleChoice") {
-                this.answers[i].response = $('input[type="radio"][value="1"]', $(this.answers[i].view)).val();
+                this.answers[i].response = $('input[type="radio"]:checked', $(this.answers[i].view)).val();
             } else if (this.answers[i].questionType == "freeResponse") {
                 this.answers[i].response = $('textarea', $(this.answers[i].view)).val();
             }
             delete this.answers[i].view;
-            delete this.answers[i].questionType;
         }
 
         var response = new Response({answers:this.answers});
@@ -83,17 +85,12 @@ window.SurveyView = Backbone.View.extend({
         var self = this;
         this.sprint.get("superlatives").each(function(superlative) {
             var selection = $("#superlative_"+superlative.get("_id")).val();
-
-            var person = self.people.find(function (model) {
-                return model.get('name') == selection;
-            });
-            superlative.get("responses").add(person);
+            superlative.get("responses").push(selection);
         });
 
 
         Backbone.sync("update", this.sprint, {
             success: function () {
-                console.log("save successful:");
                 $("#voting-modal").on("hidden.bs.modal", function() {
                     app.navigate("/", {trigger:true});
                 });

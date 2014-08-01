@@ -26,6 +26,7 @@ app.post('/sprints', survey.addSprint);
 app.put('/sprints/:id', survey.updateSprint);
 app.get('/superlatives', survey.getSuperlatives);
 app.post('/superlatives', survey.addSuperlative);
+app.put('/superlatives/:id', survey.updateSuperlative);
 app.delete('/superlatives/:id', survey.deleteSuperlative);
 
 http.createServer(app).listen(app.get('port'), function () {
