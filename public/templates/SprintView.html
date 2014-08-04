@@ -1,11 +1,22 @@
+<div class="row sprint-response-rate">
+	<div class="col-md-12">
+		<span><b>Response Rate:</b> <%= sprint.get("responseRate")*100 %>%</span>
+	</div>
+</div>
+
 <% _.each(sprint.get("questions"), function(questionId) { %>
 <% if (questions.get(questionId).get("type") == "freeResponse") { %>
 <div class="row">
 <div class="col-md-12">
+	<div class="well">
 	<h4><%= questions.get(questionId).get("questionText") %></h4>
 	<% sprint.get("responses").each(function(response) { %>
-	<p><%= response.get("answers").filter(function(answer) { return answer.question == questionId; })[0].response %></p>
+	<% var text = response.get("answers").filter(function(answer) { return answer.question == questionId; })[0].response %>
+	<% if (text != "") { %>
+		<p><%= text %></p>
+	<% } %>
 	<% }); %>
+	</div>
 </div>
 </div>
 <% } %>
@@ -20,7 +31,7 @@
 		<% } %>
 		<% }); %>
 	</tr>
-	<% var count = 0; %>
+	<% var count = 1; %>
 	<% sprint.get("responses").each(function(response) { %>
 	<tr>
 		<td><%= count %></td>

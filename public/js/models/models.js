@@ -61,7 +61,8 @@ window.Person = Backbone.Model.extend({
 
     defaults: {
         _id: null,
-        name:""
+        name:"",
+        image:"pictures/default.png"
     }
 });
 
@@ -112,7 +113,7 @@ window.Sprint = Backbone.Model.extend({
     performAnalysis: function() {
         var numResponses = this.get("responses").length;
         this.set({numberOfResponses:numResponses});
-        var responseRate = numResponses/this.get("numberOfPeople");
+        var responseRate = Math.round(numResponses/this.get("numberOfPeople")*100)/100;
         this.set({responseRate:responseRate});
         var questionAnswers = {};
         this.get("responses").each(function(response) {
@@ -131,6 +132,7 @@ window.Sprint = Backbone.Model.extend({
                         questionAnswers[answers[i].question] = [answers[i].response];
                     }*/
                 }
+                questionAnswers[answers[i].question] = Math.round(questionAnswers[answers[i].question]*100)/100;
             }
         });
         this.set({questionAnswers:questionAnswers});
@@ -216,34 +218,41 @@ window.Sprint = Backbone.Model.extend({
 
     responsesToHistory: function() {
         var superlatives = this.get("superlatives");
-        var deferred;
-        superlatives.each( function(superlative) {
-            var votes = {};
-            _.each(superlative.get("responses"), function(person) {
-                if (person in votes) {
-                    votes[person] += 1
+        var people = new PersonCollection();
+        var deferred = people.fetch().then(function() {
+            var personDeferred;
+            superlatives.each(function (superlative) {
+                var votes = {};
+                _.each(superlative.get("responses"), function (person) {
+                    if (person in votes) {
+                        votes[person] += 1
+                    } else {
+                        votes[person] = 1;
+                    }
+                });
+                var winner;
+                var maxVotes = 0;
+                for (var key in votes) {
+                    if (votes[key] > maxVotes) {
+                        winner = key;
+                        maxVotes = votes[key]
+                    }
+                }
+                var person = people.find(function (model) {
+                    return model.get('name') == winner;
+                });
+                var history = new History({person: person, superlative: superlative.get("name")});
+                if (personDeferred === undefined) {
+                    personDeferred = Backbone.sync("create", history);
                 } else {
-                    votes[person] = 1;
+                    personDeferred.then(function () {
+                        return Backbone.sync("create", history);
+                    }, null);
                 }
-            });
-            var winner;
-            var maxVotes = 0;
-            for (var key in votes) {
-                if (votes[key]>maxVotes) {
-                    winner = key;
-                    maxVotes = votes[key]
-                }
-            }
-            var history = new History({person: winner, superlative:superlative.get("name")});
-            if (deferred === undefined) {
-                deferred = Backbone.sync("create", history);
-            } else {
-                deferred.then(function() {
-                    return Backbone.sync("create", history);
-                }, null);
-            }
 
-        });
+            });
+            return personDeferred;
+        }, null);
         return deferred;
     },
 

@@ -1,10 +1,24 @@
+<div data-spy="affix" data-offset-top="70" data-offset-bottom="200" class="affix" id="stats-affix">
+	<ul class="nav">
+
+	</ul>
+</div>
+
 <div id="charts">
 
 </div>
+<% if (sprints.length>1) { %>
+<hr>
+<% } %>
 <select id="sprint-selection" class="form-control">
 	<option selected disabled hidden value=''>Select a sprint to view...</option>
 	<% sprints.each(function(sprint) { %>
-	<option value="<%= sprint.get('sprintNumber') %>">Sprint <%= sprint.get("sprintNumber") %></option>
+	<option value="<%= sprint.get('sprintNumber') %>">
+		<% var date = new Date(sprint.get("endDate")); %>
+		<% var beginDate = new Date(date.getTime()); %>
+		<% beginDate.setDate(date.getDate()-14); %>
+		Sprint <%= sprint.get("sprintNumber") %> (<%= beginDate.getMonth() %>/<%= beginDate.getDate() %>/<%= beginDate.getFullYear().toString().substring(2,4) %> - <%= date.getMonth() %>/<%= date.getDate() %>/<%= date.getFullYear().toString().substring(2,4) %>)
+	</option>
 	<% }); %>
 </select>
 <div id="sprint-details">

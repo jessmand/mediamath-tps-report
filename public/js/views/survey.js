@@ -40,7 +40,7 @@ window.SurveyView = Backbone.View.extend({
             $(this.el).html("<h2>"+this.error+"</h2>");
         } else {
             this.answers = [];
-            $(this.el).html(this.template());
+            $(this.el).html(this.template({sprint:this.sprint}));
 
             for (var i = 0; i < this.questions.length; i++) {
                 var answer = {};

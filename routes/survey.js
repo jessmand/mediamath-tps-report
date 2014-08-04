@@ -171,6 +171,37 @@ exports.deleteSuperlative = function(req, res) {
     });
 };
 
+exports.addPerson = function(req, res) {
+    var person = req.body;
+    console.log('Adding person: ' + JSON.stringify(person));
+    db.collection('people', function(err, collection) {
+        collection.insert(person, {safe:true}, function(err, result) {
+            if (err) {
+                res.send({'error':'An error has occurred'});
+            } else {
+                console.log('Success: ' + JSON.stringify(result[0]));
+                res.send(result[0]);
+            }
+        });
+    });
+};
+
+exports.deletePerson = function(req, res) {
+    var id = req.params.id;
+    console.log('Deleting person: ' + id);
+    db.collection('people', function(err, collection) {
+        collection.remove({'_id':new BSON.ObjectID(id)}, {safe:true}, function(err, result) {
+            if (err) {
+                res.send({'error':'An error has occurred - ' + err});
+            } else {
+                console.log('' + result + ' document(s) deleted');
+                res.send(req.body);
+            }
+        });
+    });
+};
+
+
 exports.updateSuperlative = function(req, res) {
     var id = req.params.id;
     var superlative = req.body;

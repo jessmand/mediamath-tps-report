@@ -24,7 +24,7 @@ window.utils = {
         var sprintCollection = new SprintCollection();
         return sprintCollection.fetch().then(function () {
             if (sprintCollection.length == 0) {
-                if (today.getDay() == 5) {
+                if (today.getDay() == 1) {
                     var endDate = new Date();
                     endDate.setHours(17,0,0,0);
                     var beginDate = new Date();

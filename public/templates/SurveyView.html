@@ -1,8 +1,6 @@
-<div class="row-fluid">
-	<div class="span12">
-		<h1>Take the survey!</h1>
-		<form id="survey" role="form"></form>
-		<button id="open-superlatives-button" data-toggle="modal" data-target="#voting-modal">Submit the survey!</button>
-
-	</div>
-</div>
+<% var date = new Date(sprint.get("endDate")); %>
+<% var beginDate = new Date(date.getTime()); %>
+<% beginDate.setDate(date.getDate()-14); %>
+<h1>Survey for Sprint <%= sprint.get("sprintNumber") %> (<%= beginDate.getMonth() %>/<%= beginDate.getDate() %>/<%= beginDate.getFullYear().toString().substring(2,4) %> - <%= date.getMonth() %>/<%= date.getDate() %>/<%= date.getFullYear().toString().substring(2,4) %>)</h1>
+<form id="survey" role="form"></form>
+<button id="open-superlatives-button" data-toggle="modal" data-target="#voting-modal">Submit the survey!</button>

@@ -13,6 +13,7 @@ window.SprintView = Backbone.View.extend({
     render: function () {
 
         $(this.el).html(this.template({sprint:this.sprint, questions:this.questions}));
+        $(this.el).css("margin-top", "20px");
         return this;
     }
 

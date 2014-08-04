@@ -4,8 +4,8 @@ var AppRouter = Backbone.Router.extend({
         ""                  : "home",
         "survey":"survey",
         "superlatives":"superlatives",
-        "sprints/:id":"sprintDetails",
-        "sprints":"stats"
+        "stats":"stats",
+        "admin":"admin"
     },
 
     initialize: function () {
@@ -28,7 +28,7 @@ var AppRouter = Backbone.Router.extend({
                 $("#content").html(new StatsView({model: sprintList}).el);
             }});
         });
-        this.headerView.selectMenuItem('sprints-menu');
+        this.headerView.selectMenuItem('stats-menu');
     },
 
     superlatives: function() {
@@ -52,17 +52,16 @@ var AppRouter = Backbone.Router.extend({
         this.headerView.selectMenuItem('survey-menu');
     },
 
-    sprintDetails: function(id) {
-        var sprint = new Sprint({_id: id});
-        sprint.fetch({success: function(){
-            $("#content").html(new SprintView({model: sprint}).el);
-        }});
-        this.headerView.selectMenuItem('sprints-menu');
+    admin: function() {
+        utils.checkForUpdates().then(function() {
+            $("#content").html(new AdminView().el);
+        });
+        this.headerView.selectMenuItem('admin-menu');
     }
 
 });
 
-utils.loadTemplate(['HomeView', 'HeaderView', 'SprintView', 'StatsView', 'SurveyView', 'SuperlativesView', 'MultipleChoiceView', 'FreeResponseView', 'VoteView', 'ChartView'], function() {
+utils.loadTemplate(['HomeView', 'HeaderView', 'SprintView', 'StatsView', 'SurveyView', 'SuperlativesView', 'MultipleChoiceView', 'FreeResponseView', 'VoteView', 'ChartView', 'AdminView'], function() {
     app = new AppRouter();
     Backbone.history.start();
 });

@@ -19,6 +19,8 @@ app.get('/sprints/:id', survey.getSprint);
 app.get('/responses', survey.getResponses);
 app.post('/responses', survey.addResponse);
 app.get('/people', survey.getPeople);
+app.delete('/people/:id', survey.deletePerson);
+app.post('/people', survey.addPerson);
 app.get('/history', survey.getSuperlativeHistory);
 app.post('/history', survey.addSuperlativeHistory);
 app.get('/questions', survey.getQuestions);
