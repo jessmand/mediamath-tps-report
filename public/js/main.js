@@ -45,7 +45,7 @@ var AppRouter = Backbone.Router.extend({
         utils.checkForUpdates().then(function() {
             var sprintList = new SprintCollection();
             return sprintList.fetch().then(function () {
-                var currentSprint = sprintList.getCurrentSprint();
+                var currentSprint = sprintList.getOpenSprint();
                 $("#content").html(new SurveyView({sprint: currentSprint}).el);
             }, null);
         });
@@ -61,7 +61,7 @@ var AppRouter = Backbone.Router.extend({
 
 });
 
-utils.loadTemplate(['HomeView', 'HeaderView', 'SprintView', 'StatsView', 'SurveyView', 'SuperlativesView', 'MultipleChoiceView', 'FreeResponseView', 'VoteView', 'ChartView', 'AdminView'], function() {
+utils.loadTemplate(['HomeView', 'HeaderView', 'SprintView', 'StatsView', 'SurveyView', 'SuperlativesView', 'MultipleChoiceView', 'FreeResponseView', 'VoteView', 'ChartView', 'AdminView', 'QuestionAdminView', 'PersonAdminView', 'SprintAdminView'], function() {
     app = new AppRouter();
     Backbone.history.start();
 });

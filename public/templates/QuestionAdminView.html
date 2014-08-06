@@ -1,0 +1,77 @@
+<div class="add-button-container">
+	<button class="btn btn-primary" data-toggle="modal" data-target="#add-question-modal">+ Add Question</button>
+</div>
+<table class="table" id="question-table">
+	<tr><th>Question</th><th>Choices</th><th></th><th></th></tr>
+	<% questions.each(function(question) { %>
+	<tr>
+		<td><%= question.get("questionText") %></td>
+		<td>
+			<% if (question.get("type") == "freeResponse") { %>
+			<p class="text-muted">Free response</p>
+			<% } else { %>
+			<%= question.get("choices").join("; ") %>
+			<% } %>
+		</td>
+		<td>
+			<% if (question.get("active") == true) { %>
+			<button class="btn btn-default deactivate-question-button" id="toggle-activate-<%= question.get('_id') %>">Deactivate</button>
+			<% } else { %>
+			<button class="btn btn-primary activate-question-button" id="toggle-activate-<%= question.get('_id') %>">Activate</button>
+			<% } %>
+		</td>
+		<td>
+			<% if (question.get("used") == true) { %>
+			<p class="text-muted">Question used in sprint</p>
+			<% } else { %>
+			<button class="btn btn-danger delete-question-button" id="delete-<%= question.get('_id') %>">Delete</button>
+			<% } %>
+		</td>
+	</tr>
+	<% }); %>
+</table>
+
+<div class="modal fade" id="add-question-modal" tabindex="-1" role="dialog" aria-labelledby="questionModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+				<h4 class="modal-title" id="questionModalLabel">Add Question</h4>
+			</div>
+			<div class="modal-body">
+				<form role="form" class="form-horizontal">
+					<div class="form-group">
+						<label for="new-question-name" class="col-sm-3 control-label">Question</label>
+						<div class="col-sm-9">
+							<input class="form-control" id="new-question-name" placeholder="Name">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="new-question-type" class="col-sm-3 control-label">Type</label>
+						<div class="col-sm-9">
+							<select class="form-control" id="new-question-type">
+								<option selected disabled hidden value=''>Select a question type...</option>
+								<option value="multipleChoice">Multiple choice</option>
+								<option value="freeResponse">Free response</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group" id="new-question-choices-group">
+						<label for="new-question-choice-1" class="col-sm-3 control-label">Choices</label>
+						<div class="col-sm-9">
+							<div class="row question-choice-line">
+								<div class="col-sm-10"><input class="form-control new-question-choice" id="new-question-choice-1" placeholder="Choice 1"></div>
+							</div>
+
+							<button class="btn btn-primary" id="add-new-question-choice">+ New Choice</button>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+				<button type="button" class="btn btn-primary" id="add-question-button">Submit</button>
+			</div>
+		</div>
+	</div>
+</div>

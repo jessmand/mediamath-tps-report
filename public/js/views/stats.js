@@ -1,7 +1,7 @@
 window.StatsView = Backbone.View.extend({
 
     initialize: function (options) {
-        this.sprints = options.model;
+        this.sprints = new SprintCollection(options.model.getCompletedSprints());
         this.questions = new QuestionCollection();
         var self = this;
         this.questions.fetch().then(function() {

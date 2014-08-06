@@ -14,10 +14,9 @@
 	<option selected disabled hidden value=''>Select a sprint to view...</option>
 	<% sprints.each(function(sprint) { %>
 	<option value="<%= sprint.get('sprintNumber') %>">
-		<% var date = new Date(sprint.get("endDate")); %>
-		<% var beginDate = new Date(date.getTime()); %>
-		<% beginDate.setDate(date.getDate()-14); %>
-		Sprint <%= sprint.get("sprintNumber") %> (<%= beginDate.getMonth() %>/<%= beginDate.getDate() %>/<%= beginDate.getFullYear().toString().substring(2,4) %> - <%= date.getMonth() %>/<%= date.getDate() %>/<%= date.getFullYear().toString().substring(2,4) %>)
+		<% var beginDate = new Date(sprint.get("startDate")); %>
+		<% var endDate = new Date(sprint.get("endDate")); %>
+		Sprint <%= sprint.get("sprintNumber") %> (<%= beginDate.getMonth()+1 %>/<%= beginDate.getDate() %>/<%= beginDate.getFullYear().toString().substring(2,4) %> - <%= endDate.getMonth()+1 %>/<%= endDate.getDate() %>/<%= endDate.getFullYear().toString().substring(2,4) %>)
 	</option>
 	<% }); %>
 </select>

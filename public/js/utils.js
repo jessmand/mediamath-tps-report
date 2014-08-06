@@ -23,39 +23,28 @@ window.utils = {
 
         var sprintCollection = new SprintCollection();
         return sprintCollection.fetch().then(function () {
-            if (sprintCollection.length == 0) {
-                if (today.getDay() == 1) {
-                    var endDate = new Date();
-                    endDate.setHours(17,0,0,0);
-                    var beginDate = new Date();
-                    beginDate.setHours(9,0,0,0);
-                    var newSprint = new Sprint({sprintNumber: 1, oldEndDate: endDate, oldBeginDate: beginDate});
-                    return newSprint.deferred.then(function () {
-                        return Backbone.sync("create", newSprint);
-                    }, null)
-                } else {
-                    return $.Deferred;
+            if (sprintCollection.length > 0) {
+                var deferred;
+                while (true) {
+                    var lastSprint = sprintCollection.getFirstUncompletedSprint();
+                    if (lastSprint != undefined) {
+                        if (today > lastSprint.get("endDate") && lastSprint.get("completed") == false) {
+                            if (deferred == undefined) {
+                                deferred = lastSprint.deactivate();
+                            } else {
+                                deferred.then(function () {
+                                    return lastSprint.deactivate();
+                                }, null)
+                            }
+                        } else {
+                            break;
+                        }
+                    } else {
+                        break;
+                    }
                 }
-
-            } else {
-                var lastSprint = sprintCollection.getLastSprint();
-                if (today<lastSprint.get("endDate") && today>lastSprint.get("beginDate")) {
-                    lastSprint.activate();
-                    return $.Deferred;
-                } else if (today>lastSprint.get("endDate") && lastSprint.get("active")) {
-                    return lastSprint.deactivate().then(function() {
-                        var newSprint = new Sprint({
-                            sprintNumber: sprintCollection.getNextSprintNumber(),
-                            oldEndDate: lastSprint.get("endDate"),
-                            oldBeginDate: lastSprint.get("beginDate")
-                        });
-                        return newSprint.deferred.then(function () {
-                            return Backbone.sync("create", newSprint);
-                        }, null)
-                    });
-
-                } else {
-                    return $.Deferred;
+                if (deferred != undefined) {
+                    return deferred;
                 }
             }
         }, null);

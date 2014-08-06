@@ -7,27 +7,27 @@ window.SurveyView = Backbone.View.extend({
             this.error = options.sprint;
         }
         var self = this;
-        var questionList = new QuestionCollection();
-        questionList.fetch({success: function(){
-            self.questions = new QuestionCollection();
-            _.each(self.sprint.get("questions"), function(id) {
-                self.questions.add(questionList.get(id));
-            });
-            var people = new PersonCollection();
-            people.fetch({success: function(){
-                self.people = people;
-                self.render();
+        if (this.error !== undefined) {
+            this.render();
+        } else {
+            var questionList = new QuestionCollection();
+            questionList.fetch({success: function () {
+                self.questions = new QuestionCollection();
+                _.each(self.sprint.get("questions"), function (id) {
+                    self.questions.add(questionList.get(id));
+                });
+                var people = new PersonCollection();
+                people.fetch({success: function () {
+                    self.people = people;
+                    self.render();
 
-            }, error: function() {
-                self.error = new Error("Could not get people");
-                self.render();
-            }
-            });
-        },
-        error: function() {
-            self.error = new Error("Could not fetch list of questions");
-            self.render();
-        }});
+                }, error: function () {
+                    self.error = new Error("Could not get people");
+                    self.render();
+                }
+                });
+            }});
+        }
 
     },
 
@@ -83,9 +83,11 @@ window.SurveyView = Backbone.View.extend({
 
         this.sprint.addResponse(response);
         var self = this;
-        this.sprint.get("superlatives").each(function(superlative) {
-            var selection = $("#superlative_"+superlative.get("_id")).val();
-            superlative.get("responses").push(selection);
+        var count = 0;
+        _.each(this.sprint.get("superlatives"), function(superlative) {
+            var selection = $("#superlative_"+count).val();
+            superlative["responses"].push(selection);
+            count++;
         });
 
 

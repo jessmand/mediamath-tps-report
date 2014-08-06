@@ -23,6 +23,55 @@ exports.getQuestions = function(req, res) {
     });
 };
 
+exports.addQuestion = function(req, res) {
+    var question = req.body;
+    console.log('Adding question: ' + JSON.stringify(question));
+    db.collection('questions', function(err, collection) {
+        collection.insert(question, {safe:true}, function(err, result) {
+            if (err) {
+                res.send({'error':'An error has occurred'});
+            } else {
+                console.log('Success: ' + JSON.stringify(result[0]));
+                res.send(result[0]);
+            }
+        });
+    });
+};
+
+exports.deleteQuestion = function(req, res) {
+    var id = req.params.id;
+    console.log('Deleting question: ' + id);
+    db.collection('questions', function(err, collection) {
+        collection.remove({'_id':new BSON.ObjectID(id)}, {safe:true}, function(err, result) {
+            if (err) {
+                res.send({'error':'An error has occurred - ' + err});
+            } else {
+                console.log('' + result + ' document(s) deleted');
+                res.send(req.body);
+            }
+        });
+    });
+};
+
+exports.updateQuestion = function(req, res) {
+    var id = req.params.id;
+    var question = req.body;
+    delete question._id;
+    console.log('Updating question: ' + id);
+    console.log(JSON.stringify(question));
+    db.collection('questions', function(err, collection) {
+        collection.update({'_id':new BSON.ObjectID(id)}, question, {safe:true}, function(err, result) {
+            if (err) {
+                console.log('Error updating question: ' + err);
+                res.send({'error':'An error has occurred'});
+            } else {
+                console.log('' + result + ' document(s) updated');
+                res.send(question);
+            }
+        });
+    });
+};
+
 exports.getSuperlativeHistory = function(req, res) {
     db.collection('history', function(err, collection) {
         collection.find().toArray(function(err, items) {
@@ -113,15 +162,6 @@ exports.addSprint = function(req, res) {
     });
 };
 
-
-exports.getSuperlatives = function(req, res) {
-    db.collection('superlatives', function(err, collection) {
-        collection.find().toArray(function(err, items) {
-            res.send(items);
-        });
-    });
-};
-
 exports.updateSprint = function(req, res) {
     var id = req.params.id;
     var sprint = req.body;
@@ -141,25 +181,10 @@ exports.updateSprint = function(req, res) {
     });
 };
 
-exports.addSuperlative = function(req, res) {
-    var superlative = req.body;
-    console.log('Adding superlative: ' + JSON.stringify(superlative));
-    db.collection('superlatives', function(err, collection) {
-        collection.insert(superlative, {safe:true}, function(err, result) {
-            if (err) {
-                res.send({'error':'An error has occurred'});
-            } else {
-                console.log('Success: ' + JSON.stringify(result[0]));
-                res.send(result[0]);
-            }
-        });
-    });
-};
-
-exports.deleteSuperlative = function(req, res) {
+exports.deleteSprint = function(req, res) {
     var id = req.params.id;
-    console.log('Deleting superlative: ' + id);
-    db.collection('superlatives', function(err, collection) {
+    console.log('Deleting sprint: ' + id);
+    db.collection('sprints', function(err, collection) {
         collection.remove({'_id':new BSON.ObjectID(id)}, {safe:true}, function(err, result) {
             if (err) {
                 res.send({'error':'An error has occurred - ' + err});
@@ -200,64 +225,3 @@ exports.deletePerson = function(req, res) {
         });
     });
 };
-
-
-exports.updateSuperlative = function(req, res) {
-    var id = req.params.id;
-    var superlative = req.body;
-    delete superlative._id;
-    console.log('Updating superlative: ' + id);
-    console.log(JSON.stringify(superlative));
-    db.collection('superlatives', function(err, collection) {
-        collection.update({'_id':new BSON.ObjectID(id)}, superlative, {safe:true}, function(err, result) {
-            if (err) {
-                console.log('Error updating superlative: ' + err);
-                res.send({'error':'An error has occurred'});
-            } else {
-                console.log('' + result + ' document(s) updated');
-                res.send(superlative);
-            }
-        });
-    });
-};
-/*--------------------------------------------------------------------------------------------------------------------*/
-// Populate database with sample data -- Only used once: the first time the application is started.
-// You'd typically not find this code in a real-life app, since the database would already exist.
-/*var populateEmails = function() {
-
-    var emails = [
-        {
-            name: "Jessica Andersen",
-            email: "jandersen@mediamath.com"
-        },
-        {
-            name: "David Ashpole",
-            email: "dashpole@mediamath.com"
-        }
-    ];
-
-    db.collection('emails', function(err, collection) {
-        collection.insert(emails, {safe:true}, function(err, result) {});
-    });
-
-};
-
-var populateQuestions = function() {
-
-    var questions = [
-        {
-            type:"multipleChoice",
-            questionText:"How happy are you with your role?",
-            choices:["1", "2", "3", "4", "5"]
-        },
-        {
-            type:"freeResponse",
-            questionText:"What could we do to make you happier?"
-        }
-    ];
-
-    db.collection('questions', function(err, collection) {
-        collection.insert(questions, {safe:true}, function(err, result) {});
-    });
-
-};*/

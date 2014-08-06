@@ -110,3 +110,16 @@
 	margin-top:20px;
 	margin-bottom:20px;
 }
+
+.question-choice-line, .superlative-line {
+	margin-bottom:5px;
+}
+
+#delete-question-choice, #delete-sprint-superlative {
+	cursor:pointer;
+	vertical-align:-7px;
+}
+
+body {
+	padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+}

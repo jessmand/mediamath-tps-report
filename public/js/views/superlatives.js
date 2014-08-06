@@ -12,7 +12,7 @@ window.SuperlativesView = Backbone.View.extend({
             var historyCanvas = $("<canvas width='300' height='410'></canvas>");
             var superlativeTile = $("<div class='superlative-tile'></div>");
             superlativeTile.prepend(historyCanvas);
-            $("#superlative-tiles", $(self.el)).append(superlativeTile);
+            $("#superlative-tiles", $(self.el)).prepend(superlativeTile);
             var ctx = historyCanvas[0].getContext("2d");
             var img = new Image();
             img.onload = function() {
