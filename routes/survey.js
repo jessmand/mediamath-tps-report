@@ -5,23 +5,19 @@ var Server = mongo.Server,
     MongoClient = mongo.MongoClient,
     BSON = mongo.BSONPure;
 
-var MONGODB_URI = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || "mongodb://localhost", // Make sure to replace that URI with the one provided by MongoLab
-    db,
-    users;
+var MONGODB_URI = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || "mongodb://localhost"; // Make sure to replace that URI with the one provided by MongoLab
+var db;
 
 MongoClient.connect(MONGODB_URI, function(err, database) {
+    if (err) {
+        throw err;
+    }
     db = database;
 });
 
 //var server = new Server('dbh44', 27447, {auto_reconnect: true});
 //db = new Db('surveydb', server, {safe: true});
 //db = new Mongo().getDB("myDatabase");
-
-db.open(function(err, db) {
-    if (err) {
-        console.log(err);
-    }
-});
 
 exports.getQuestions = function(req, res) {
     db.collection('questions', function(err, collection) {
