@@ -14,7 +14,7 @@ window.HomeView = Backbone.View.extend({
     },
 
     goToSurvey: function() {
-        app.navigate("#survey", {trigger:true});
+        app.navigate("survey", {trigger:true});
     }
 
 });

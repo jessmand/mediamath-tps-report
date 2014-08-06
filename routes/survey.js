@@ -2,10 +2,19 @@ var mongo = require('mongodb');
 
 var Server = mongo.Server,
     Db = mongo.Db,
+    MongoClient = mongo.MongoClient,
     BSON = mongo.BSONPure;
 
-var server = new Server('localhost', 27017, {auto_reconnect: true});
-db = new Db('surveydb', server, {safe: true});
+var MONGODB_URI = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || "mongodb://localhost", // Make sure to replace that URI with the one provided by MongoLab
+    db,
+    users;
+
+MongoClient.connect(MONGODB_URI, function(err, database) {
+    db = database;
+});
+
+//var server = new Server('dbh44', 27447, {auto_reconnect: true});
+//db = new Db('surveydb', server, {safe: true});
 //db = new Mongo().getDB("myDatabase");
 
 db.open(function(err, db) {

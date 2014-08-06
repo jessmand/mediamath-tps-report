@@ -22,7 +22,6 @@ window.StatsView = Backbone.View.extend({
                     var data = {};
                     data.labels = self.labels;
                     var color = self.getRandomColor();
-                    console.log(color);
                     var dataset = {
                         strokeColor: color,
                         pointColor: color,
