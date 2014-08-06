@@ -46,8 +46,10 @@
 	<tr>
 		<th>Average</th>
 		<% _.each(sprint.get("questions"), function(questionId) { %>
-		<% if (questions.get(questionId).get("type") == "multipleChoice") { %>
+		<% if (questions.get(questionId).get("type") == "multipleChoice" && questions.get(questionId).get("isNumerical") == true) { %>
 			<th><%= sprint.get("questionAnswers")[questionId] %></th>
+		<% } else if (questions.get(questionId).get("type") == "multipleChoice" && questions.get(questionId).get("isNumerical") == false) { %>
+			<th></th>
 		<% } %>
 		<% }); %>
 	</tr>

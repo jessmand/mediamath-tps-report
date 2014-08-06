@@ -90,16 +90,12 @@ window.Sprint = Backbone.Model.extend({
             self.get("responses").each(function (response) {
                 var answers = response.get("answers");
                 for (var i = 0; i < answers.length; i++) {
-                    if (answers[i].question in questionAnswers) {
-                        if (answers[i].questionType == "multipleChoice") {
+                    if (answers[i].questionType == "multipleChoice" && answers[i].isNumerical == true) {
+                        if (answers[i].question in questionAnswers) {
                             questionAnswers[answers[i].question] += parseInt(answers[i].response) / numResponses;
-                        }
-
-                    } else {
-                        if (answers[i].questionType == "multipleChoice") {
+                        } else {
                             questionAnswers[answers[i].question] = parseInt(answers[i].response) / numResponses;
                         }
-
                     }
                     questionAnswers[answers[i].question] = Math.round(questionAnswers[answers[i].question] * 100) / 100;
                 }

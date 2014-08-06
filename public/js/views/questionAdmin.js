@@ -75,9 +75,14 @@ window.QuestionAdminView = Backbone.View.extend({
         options.type = $("#new-question-type").val();
         if (options.type == "multipleChoice") {
             var choices = [];
+            var isNumerical = true;
             $(".new-question-choice").each(function() {
                 choices.push($(this).val());
+                if (isNaN($(this).val())) {
+                    isNumerical = false;
+                }
             });
+            options.isNumerical = isNumerical;
             options.choices = choices;
         }
         var question = new Question(options);

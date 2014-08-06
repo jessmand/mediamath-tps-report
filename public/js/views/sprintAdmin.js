@@ -11,6 +11,12 @@ window.SprintAdminView = Backbone.View.extend({
 
     render:function () {
         $(this.el).html(this.template({sprints:this.sprints}));
+        $('#add-sprint-modal').on('hidden.bs.modal', function (e) {
+            $("#start-date").datepicker("refresh");
+            $("#end-date").datepicker("refresh");
+            $(".superlative-line:not(:first)").remove();
+            $("#new-sprint-superlative-1").val('');
+        });
         var today = new Date();
         today.setHours(0,0,0,0);
         if (this.sprints.length>0) {
@@ -78,7 +84,6 @@ window.SprintAdminView = Backbone.View.extend({
         options.startDate = $("#start-date").datepicker("getDate");
         options.endDate = $("#end-date").datepicker("getDate");
         options.endDate.setHours(23,59,59,999);
-        console.log(options.endDate);
         options.superlatives = [];
         $(".new-sprint-superlative").each(function() {
             options.superlatives.push({name:$(this).val(),responses:[]});

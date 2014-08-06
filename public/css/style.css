@@ -123,3 +123,27 @@
 body {
 	padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
 }
+
+.survey-question {
+	margin-bottom:30px;
+}
+
+#survey-title {
+	margin-bottom:30px;
+}
+
+.home-jumbotron {
+	text-align:center;
+}
+
+.home-jumbotron h1 {
+	margin-bottom:30px;
+}
+
+#take-survey-button {
+	margin-bottom:30px;
+}
+
+.close-survey-button {
+	margin-right:10px;
+}

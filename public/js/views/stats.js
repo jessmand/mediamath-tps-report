@@ -18,7 +18,7 @@ window.StatsView = Backbone.View.extend({
             var allDatasets = [];
 
             this.questions.each(function (question) {
-                if (question.get("type") == "multipleChoice") {
+                if (question.get("type") == "multipleChoice" && question.get("isNumerical") == true) {
                     var data = {};
                     data.labels = self.labels;
                     var color = self.getRandomColor();

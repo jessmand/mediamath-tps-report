@@ -24,14 +24,13 @@
 			<% if (sprint.get("open") == false && today>startDate && today<endDate && sprint.get("completed") == false) { %>
 			<button class="btn btn-primary open-survey-button" id="open-survey-<%= sprint.get('_id') %>">Open survey</button>
 			<% } else if (sprint.get("open") == true) { %>
-			<button class="btn btn-default close-survey-button" id="close-survey-<%= sprint.get('_id') %>">Close survey</button>
-			<button class="btn btn-primary end-sprint-button" id="end-sprint-<%= sprint.get('_id') %>">Close survey and end sprint</button>
+			<button class="btn btn-default close-survey-button" id="close-survey-<%= sprint.get('_id') %>">Close survey</button><button class="btn btn-primary end-sprint-button" id="end-sprint-<%= sprint.get('_id') %>">Close survey and end sprint</button>
 			<% } %>
 		</td>
 		<td>
 			<% if (count==sprints.length && sprint.get("completed") == false) { %>
 			<button class="btn btn-danger delete-sprint-button" id="delete-<%= sprint.get('_id') %>">Delete</button>
-			<% } else { %>
+			<% } else if (sprint.get("completed") == true) { %>
 			<p class="text-muted">Completed</p>
 			<% } %>
 		</td>

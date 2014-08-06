@@ -56,12 +56,12 @@ window.SurveyView = Backbone.View.extend({
                 }
                 answer.question = this.questions.at(i).get("_id");
                 answer.questionType = this.questions.at(i).get("type");
+                answer.isNumerical = this.questions.at(i).get("isNumerical");
                 answer.view = view.el;
                 this.answers.push(answer);
             }
 
             var voteView = new VoteView({sprint: this.sprint, people: this.people});
-            console.log(this.sprint);
             $(this.el).append(voteView.el);
         }
         return this;
