@@ -6,11 +6,11 @@ window.AdminView = Backbone.View.extend({
         this.questions = new QuestionCollection();
         var self = this;
 
-            self.sprints.fetch().then(function() {
-                self.questions.fetch().then(function() {
-                    self.render();
-                });
+        self.sprints.fetch().then(function() {
+            self.questions.fetch().then(function() {
+                self.render();
             });
+        });
 
     },
 
@@ -20,6 +20,8 @@ window.AdminView = Backbone.View.extend({
         this.currentView = new SprintAdminView({adminView: this});
         $("#sprints").append(this.currentView.el);
         var self = this;
+
+        //handling the switching of tabs and rerendering of admin views
         $('#admin-tabs a').click(function (e) {
             e.preventDefault();
             self.currentView.remove();
@@ -40,6 +42,9 @@ window.AdminView = Backbone.View.extend({
         return this;
     },
 
+    //refreshing the sprint view so I don't have to handle changing the table manually
+    //let the template handle it!
+    //pass this function into the sprint view so it can call the function
     refreshSprintView:function() {
         this.currentView.remove();
         this.currentView = new SprintAdminView({adminView: this});

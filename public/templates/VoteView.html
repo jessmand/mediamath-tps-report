@@ -10,8 +10,8 @@
 					<% var count = 0 %>
 				<% _.each(superlatives, function(superlative) { %>
 					<div class="form-group">
-						<label for="superlative_<%= count %>" class="col-sm-2 control-label"><%= superlative["name"] %></label>
-						<div class="col-sm-10">
+						<label for="superlative_<%= count %>" class="col-sm-4 control-label"><%= superlative["name"] %></label>
+						<div class="col-sm-8">
 							<select class="form-control" id="superlative_<%= count %>">
 								<% people.each(function(person) { %>
 									<option><%= person.get("name") %></option>

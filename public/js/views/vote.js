@@ -9,6 +9,7 @@ window.VoteView = Backbone.View.extend({
     },
 
     render: function () {
+        //display a modal with the superlatives and all the people listed
         $(this.el).html(this.template({
             sprintNumber:this.sprint.get("sprintNumber"),
             superlatives:this.sprint.get("superlatives"),

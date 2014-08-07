@@ -1,6 +1,3 @@
-/**
- * Created by janderson on 8/5/14.
- */
 window.QuestionAdminView = Backbone.View.extend({
 
     initialize:function () {
@@ -14,6 +11,7 @@ window.QuestionAdminView = Backbone.View.extend({
     render:function () {
         $(this.el).html(this.template({questions:this.questions}));
         $("#new-question-choices-group").hide();
+        //clear the new question modal when it's closed
         $('#add-question-modal').on('hidden.bs.modal', function (e) {
             $("#new-question-name").val('');
             $("#new-question-type").val('');
@@ -34,6 +32,7 @@ window.QuestionAdminView = Backbone.View.extend({
         "click .deactivate-question-button":"deactivateQuestion"
     },
 
+    //for the new choice button: adds a line and moves the x button to the last line
     addQuestionChoice: function(e) {
         e.preventDefault();
         var choiceNumber = $(".question-choice-line").length+1;
@@ -49,6 +48,7 @@ window.QuestionAdminView = Backbone.View.extend({
         newChoice.insertAfter($(".question-choice-line").last());
     },
 
+    //deletes the last line of choices, and moves the x to the new last line
     deleteQuestionChoice: function() {
         var deleteChoiceButton = $("#delete-question-choice");
 
@@ -61,6 +61,7 @@ window.QuestionAdminView = Backbone.View.extend({
         }
     },
 
+    //show or hide the add choices part depending on whether the question type is free response or multiple choice
     selectQuestionType: function() {
         if ($("#new-question-type").val() == "freeResponse") {
             $("#new-question-choices-group").hide();
@@ -69,6 +70,9 @@ window.QuestionAdminView = Backbone.View.extend({
         }
     },
 
+    //get the information about the question from the modal
+    //and save it as a model
+    //and add a row to the table of questions
     addQuestion: function() {
         var options = {};
         options.questionText = $("#new-question-name").val();
@@ -106,11 +110,13 @@ window.QuestionAdminView = Backbone.View.extend({
         $('#add-question-modal').modal('hide');
     },
 
+    //remove the question from the collection and delete the row
     deleteQuestion: function(e) {
         $(e.target).parents("tr").remove();
         this.questions.get(e.target.id.substring(7)).destroy();
     },
 
+    //activate the question: whether it will be pulled into any sprint created in the future
     activateQuestion: function(e) {
         var question = this.questions.get(e.target.id.substring(16));
         question.set({active:true});
@@ -119,6 +125,7 @@ window.QuestionAdminView = Backbone.View.extend({
         $(e.target).replaceWith($('<button class="btn btn-default deactivate-question-button" id="toggle-activate-'+question.get('_id')+'">Deactivate</button>'));
     },
 
+    //deactivate the question so it will not be pulled into a future sprint
     deactivateQuestion: function(e) {
         var question = this.questions.get(e.target.id.substring(16));
         question.set({active:false});

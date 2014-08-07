@@ -11,12 +11,14 @@ window.SprintAdminView = Backbone.View.extend({
 
     render:function () {
         $(this.el).html(this.template({sprints:this.sprints}));
+        //on closing the new sprint modal, clear the modal
         $('#add-sprint-modal').on('hidden.bs.modal', function (e) {
             $("#start-date").datepicker("refresh");
             $("#end-date").datepicker("refresh");
             $(".superlative-line:not(:first)").remove();
             $("#new-sprint-superlative-1").val('');
         });
+        //the start date must be after the end date of the last sprint
         var today = new Date();
         today.setHours(0,0,0,0);
         if (this.sprints.length>0) {
@@ -30,6 +32,7 @@ window.SprintAdminView = Backbone.View.extend({
             numberOfMonths: 2,
             minDate: lastEndDate,
             onClose: function( selectedDate ) {
+                //the end date should be either past today or past the start date, whichever is the latest
                 $( "#end-date" ).datepicker( "option", "minDate", new Date(Math.max.apply(null,[new Date(selectedDate),today])) );
             }
         });
@@ -52,6 +55,7 @@ window.SprintAdminView = Backbone.View.extend({
         "click .end-sprint-button": "endSprint"
     },
 
+    //add a new line for a new superlative
     addSuperlative: function(e) {
         e.preventDefault();
         var superlativeNumber = $(".superlative-line").length+1;
@@ -67,6 +71,7 @@ window.SprintAdminView = Backbone.View.extend({
         newSuperlative.insertAfter($(".superlative-line").last());
     },
 
+    //delete the last line of superlatives
     deleteSuperlative: function() {
         var deleteSuperlativeButton = $("#delete-sprint-superlative");
 
@@ -79,6 +84,8 @@ window.SprintAdminView = Backbone.View.extend({
         }
     },
 
+    //take the information from the modal to make a new sprint and save it
+    //then refresh the view so we don't have to mess with updating the view
     addSprint: function() {
         var options = {};
         options.startDate = $("#start-date").datepicker("getDate");
@@ -100,12 +107,16 @@ window.SprintAdminView = Backbone.View.extend({
 
     },
 
+    //delete a sprint
+    //only allowed if it is the last sprint in the list and has not been completed
     deleteSprint: function(e) {
         var self = this;
         var sprint = this.sprints.get(e.target.id.substring(7));
         var sprintQuestions = sprint.get("questions");
         sprint.destroy().then(function() {
             self.sprints.fetch().then(function() {
+                //find out if after deleting the sprint
+                //all the questions we thought were being used by sprints are still being used
                 self.sprints.each(function(otherSprint) {
                     var usedQuestions = otherSprint.get("questions");
                     _.each(usedQuestions, function(usedQuestion) {
@@ -129,6 +140,7 @@ window.SprintAdminView = Backbone.View.extend({
         }, null);
     },
 
+    //make the survey for a sprint available and replace the open survey button with close survey buttons
     openSurvey: function(e) {
         var sprint = this.sprints.get(e.target.id.substring(12));
         sprint.set({open:true});
@@ -136,6 +148,7 @@ window.SprintAdminView = Backbone.View.extend({
         $(e.target).replaceWith('<button class="btn btn-default close-survey-button" id="close-survey-'+sprint.get("_id")+'">Close survey</button><button class="btn btn-primary end-sprint-button" id="end-sprint-'+sprint.get("_id")+'">Close survey and end sprint</button>');
     },
 
+    //make the survey unavailable and replace the close survey button with an open survey button
     closeSurvey: function(e) {
         var sprint = this.sprints.get(e.target.id.substring(13));
         sprint.set({open:false});
@@ -144,6 +157,7 @@ window.SprintAdminView = Backbone.View.extend({
         $("#end-sprint-"+sprint.get("_id")).remove();
     },
 
+    //make the survey unavailable, deactivate the sprint, then refresh the view
     endSprint: function(e) {
         var sprint = this.sprints.get(e.target.id.substring(11));
         sprint.set({open:false});

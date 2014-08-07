@@ -12,20 +12,19 @@ window.SurveyView = Backbone.View.extend({
         } else {
             var questionList = new QuestionCollection();
             questionList.fetch({success: function () {
+
+                //populate a collection of questions with the questions pulled into this sprint
                 self.questions = new QuestionCollection();
                 _.each(self.sprint.get("questions"), function (id) {
                     self.questions.add(questionList.get(id));
                 });
+
+                //get the people to show for choosing superlatives
                 var people = new PersonCollection();
                 people.fetch({success: function () {
                     self.people = people;
                     self.render();
-
-                }, error: function () {
-                    self.error = new Error("Could not get people");
-                    self.render();
-                }
-                });
+                }});
             }});
         }
 
@@ -37,11 +36,14 @@ window.SurveyView = Backbone.View.extend({
 
     render: function () {
         if (this.error !== undefined) {
+            //display the error if there is one
             $(this.el).html("<h2>"+this.error+"</h2>");
         } else {
             this.answers = [];
             $(this.el).html(this.template({sprint:this.sprint}));
 
+            //go through all the questions and make a new view to a view to append to the survey
+            //based on what the question type is
             for (var i = 0; i < this.questions.length; i++) {
                 var answer = {};
                 var view;
@@ -54,6 +56,7 @@ window.SurveyView = Backbone.View.extend({
                     view = new FreeResponseView({model: this.questions.at(i)});
                     $('#survey', this.el).prepend(view.el);
                 }
+                //get ready to collect answers!
                 answer.question = this.questions.at(i).get("_id");
                 answer.questionType = this.questions.at(i).get("type");
                 answer.isNumerical = this.questions.at(i).get("isNumerical");
@@ -67,9 +70,11 @@ window.SurveyView = Backbone.View.extend({
         return this;
     },
 
+    //when the submit button in the voting view is pressed
+    //collect the answers from the survey and from the superlatives and save them
     submit: function(e) {
 
-
+        //get the answers from survey questions and put them into the answers
         for (var i=0; i<this.answers.length; i++) {
             if (this.answers[i].questionType == "multipleChoice") {
                 this.answers[i].response = $('input[type="radio"]:checked', $(this.answers[i].view)).val();
@@ -78,10 +83,10 @@ window.SurveyView = Backbone.View.extend({
             }
             delete this.answers[i].view;
         }
-
+        //make a new response from the answers
         var response = new Response({answers:this.answers});
-
         this.sprint.addResponse(response);
+
         var self = this;
         var count = 0;
         _.each(this.sprint.get("superlatives"), function(superlative) {
@@ -90,7 +95,7 @@ window.SurveyView = Backbone.View.extend({
             count++;
         });
 
-
+        //go to the home page after the survey is successfully submitted
         Backbone.sync("update", this.sprint, {
             success: function () {
                 $("#voting-modal").on("hidden.bs.modal", function() {

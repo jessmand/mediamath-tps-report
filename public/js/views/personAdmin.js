@@ -10,6 +10,7 @@ window.PersonAdminView = Backbone.View.extend({
 
     render:function () {
         $(this.el).html(this.template({people:this.people}));
+        //clear the add new person modal when it's closed
         $('#add-person-modal').on('hidden.bs.modal', function (e) {
             $("#new-person-name").val('');
             $("#new-person-picture").val('');
@@ -22,6 +23,8 @@ window.PersonAdminView = Backbone.View.extend({
         "click .delete-person-button": "deletePerson"
     },
 
+    //gets info from the form and saves a new person to the database
+    //then makes a new row for them
     addPerson: function() {
         var person = new Person({name:$("#new-person-name").val(), image:$("#new-person-picture").val()});
         var self= this;
@@ -33,6 +36,8 @@ window.PersonAdminView = Backbone.View.extend({
         $('#add-person-modal').modal('hide');
     },
 
+    //deletes the person's row, then uses the id from the button's id to find the person model
+    //and delete it from the collection
     deletePerson: function(e) {
         $(e.target).parents("tr").remove();
         this.people.get(e.target.id.substring(7)).destroy();

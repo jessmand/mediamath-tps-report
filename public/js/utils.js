@@ -18,6 +18,7 @@ window.utils = {
         $.when.apply(null, deferreds).done(callback);
     },
 
+    //check if any of the sprints are over and thus need to be deactivated
     checkForUpdates: function() {
         var today = new Date();
 

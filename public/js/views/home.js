@@ -13,6 +13,7 @@ window.HomeView = Backbone.View.extend({
         "click #take-survey-button":"goToSurvey"
     },
 
+    //for the big "take the survey" button on the home page
     goToSurvey: function() {
         app.navigate("survey", {trigger:true});
     }
