@@ -22,7 +22,7 @@ window.SprintAdminView = Backbone.View.extend({
         var today = new Date();
         today.setHours(0,0,0,0);
         var lastEndDatePlus14 = null;
-        var lastEndDatePlus1 = null;
+        var lastEndDatePlus1 = today;
         if (this.sprints.length>0) {
             lastEndDatePlus14 = new Date(this.sprints.last().get("endDate"));
             lastEndDatePlus14.setDate(lastEndDatePlus14.getDate()+14);
