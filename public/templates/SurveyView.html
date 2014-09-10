@@ -1,5 +1,4 @@
-<% var beginDate = new Date(sprint.get("startDate")); %>
 <% var endDate = new Date(sprint.get("endDate")); %>
-<h1 id="survey-title">Survey for Sprint <%= sprint.get("sprintNumber") %> (<%= beginDate.getMonth()+1 %>/<%= beginDate.getDate() %>/<%= beginDate.getFullYear().toString().substring(2,4) %> - <%= endDate.getMonth()+1 %>/<%= endDate.getDate() %>/<%= endDate.getFullYear().toString().substring(2,4) %>)</h1>
+<h1 id="survey-title">Survey for <%= sprint.get("sprintName") %> (Ends <%= endDate.getMonth()+1 %>/<%= endDate.getDate() %>/<%= endDate.getFullYear().toString().substring(2,4) %>)</h1>
 <form id="survey" role="form"></form>
 <button class="btn btn-primary btn-lg" id="open-superlatives-button" data-toggle="modal" data-target="#voting-modal">Submit</button>
