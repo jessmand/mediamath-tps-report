@@ -111,9 +111,10 @@ window.StatsView = Backbone.View.extend({
     //make an array with all the sprint names to use for labels
     makeLabelArray: function() {
         this.labels = [];
-        for (var i=1; i<=this.sprints.length; i++) {
-            this.labels.push("Sprint "+i.toString());
-        }
+        var self = this;
+        this.sprints.each(function(sprint) {
+            self.labels.push(sprint.get("sprintName"));
+        });
     },
 
     //changes the margin based on the page size so the affix and content don't overlap

@@ -2,16 +2,14 @@
 	<button class="btn btn-primary" data-toggle="modal" data-target="#add-sprint-modal">+ Add Sprint</button>
 </div>
 <table class="table" id="sprint-table">
-	<tr><th>#</th><th>Start date</th><th>End date</th><th>Superlatives</th><th></th><th></th></tr>
+	<tr><th>Name</th><th>End date</th><th>Superlatives</th><th></th><th></th></tr>
 	<% var count = 0 %>
 	<% sprints.each(function(sprint) { %>
 	<% count++ %>
 	<tr>
-		<% var startDate = new Date(sprint.get("startDate")); %>
 		<% var endDate = new Date(sprint.get("endDate")); %>
 		<% var today = new Date() %>
-		<td><%= sprint.get("sprintNumber") %></td>
-		<td><%= startDate.getMonth()+1 %>/<%= startDate.getDate() %>/<%= startDate.getFullYear().toString().substring(2,4) %></td>
+		<td><%= sprint.get("sprintName") %></td>
 		<td><%= endDate.getMonth()+1 %>/<%= endDate.getDate() %>/<%= endDate.getFullYear().toString().substring(2,4) %></td>
 		<td>
 			<% var superlativeList = []; %>
@@ -21,7 +19,7 @@
 			<%= superlativeList.join("; ") %>
 		</td>
 		<td>
-			<% if (sprint.get("open") == false && today>startDate && today<endDate && sprint.get("completed") == false) { %>
+			<% if (sprint.get("open") == false && today<endDate && sprint.get("completed") == false) { %>
 			<button class="btn btn-primary open-survey-button" id="open-survey-<%= sprint.get('_id') %>">Open survey</button>
 			<% } else if (sprint.get("open") == true) { %>
 			<button class="btn btn-default close-survey-button" id="close-survey-<%= sprint.get('_id') %>">Close survey</button><button class="btn btn-primary end-sprint-button" id="end-sprint-<%= sprint.get('_id') %>">Close survey and end sprint</button>
@@ -47,15 +45,21 @@
 			</div>
 			<div class="modal-body">
 				<form role="form">
-					<div class="form-group col-md-6">
-						<label for="start-date">Start Date</label>
-						<input class="form-control" type="text" id="start-date" placeholder="Select date">
+					<div class="form-group">
+						<label for="sprint-name" class="col-sm-3 control-label">Name</label>
+						<div class="col-sm-9">
+							<input class="form-control" id="sprint-name" placeholder="Name">
+						</div>
 					</div>
-					<div class="form-group col-md-6">
-						<label for="end-date">End Date</label>
-						<input class="form-control" type="text" id="end-date" placeholder="Select date">
+					<div class="form-group">
+						<label for="end-date" class="col-sm-3 control-label">End Date</label>
+						<div class="col-sm-9">
+							<input class="form-control" id="end-date" placeholder="Select date">
+						</div>
 					</div>
 				</form>
+
+
 				<form role="form" class="form-horizontal">
 					<div class="form-group">
 						<label for="new-sprint-superlative-1" class="col-sm-3 control-label">Superlatives</label>

@@ -21,26 +21,18 @@ window.SprintAdminView = Backbone.View.extend({
         //the start date must be after the end date of the last sprint
         var today = new Date();
         today.setHours(0,0,0,0);
+        var lastEndDatePlus14 = null;
+        var lastEndDatePlus1 = null;
         if (this.sprints.length>0) {
-            var lastEndDate = new Date(this.sprints.last().get("endDate"));
-            lastEndDate.setDate(lastEndDate.getDate()+1);
-        } else {
-            var lastEndDate = null;
+            lastEndDatePlus14 = new Date(this.sprints.last().get("endDate"));
+            lastEndDatePlus14.setDate(lastEndDatePlus14.getDate()+14);
+            lastEndDatePlus1 = new Date(this.sprints.last().get("endDate"));
+            lastEndDatePlus1.setDate(lastEndDatePlus14.getDate()+1);
         }
-        $( "#start-date" ).datepicker({
-            defaultDate: lastEndDate,
-            numberOfMonths: 2,
-            minDate: lastEndDate,
-            onClose: function( selectedDate ) {
-                //the end date should be either past today or past the start date, whichever is the latest
-                $( "#end-date" ).datepicker( "option", "minDate", new Date(Math.max.apply(null,[new Date(selectedDate),today])) );
-            }
-        });
         $( "#end-date" ).datepicker({
+            defaultDate: lastEndDatePlus14,
             numberOfMonths: 2,
-            onClose: function( selectedDate ) {
-                $( "#start-date" ).datepicker( "option", "maxDate", selectedDate );
-            }
+            minDate: lastEndDatePlus1
         });
         return this;
     },
@@ -88,14 +80,13 @@ window.SprintAdminView = Backbone.View.extend({
     //then refresh the view so we don't have to mess with updating the view
     addSprint: function() {
         var options = {};
-        options.startDate = $("#start-date").datepicker("getDate");
         options.endDate = $("#end-date").datepicker("getDate");
         options.endDate.setHours(23,59,59,999);
         options.superlatives = [];
         $(".new-sprint-superlative").each(function() {
             options.superlatives.push({name:$(this).val(),responses:[]});
         });
-        options.sprintNumber = this.sprints.getNextSprintNumber();
+        options.sprintName = $("#sprint-name").val();
         var sprint = new Sprint(options);
         var self = this;
         $('#add-sprint-modal').on('hidden.bs.modal', function (e) {

@@ -15,21 +15,6 @@ window.QuestionCollection = Backbone.Collection.extend({
     url: "questions"
 });
 
-window.Email = Backbone.Model.extend({
-    urlRoot: "/emails",
-    idAttribute:"_id",
-    defaults: {
-        _id: null,
-        email: "",
-        name: ""
-    }
-});
-
-window.EmailCollection = Backbone.Collection.extend({
-    model: Email,
-    url: "emails"
-});
-
 window.Response = Backbone.Model.extend({
 
     urlRoot: "/responses",
@@ -73,19 +58,21 @@ window.PersonCollection = Backbone.Collection.extend({
 
 window.Sprint = Backbone.Model.extend({
 
-    //sprintNumber
-
     urlRoot: "/sprints",
 
     idAttribute: "_id",
 
+    //when a sprint is deactivated, aggregate results from the responses
     performAnalysis: function() {
         var numResponses = this.get("responses").length;
         this.set({numberOfResponses:numResponses});
         var self = this;
         return this.setPossiblePeople().then(function() {
+            //compare the number of responses received with
+            //the number of possible people who could have responded
             var responseRate = Math.round(numResponses / self.get("numberOfPeople") * 100) / 100;
             self.set({responseRate: responseRate});
+            //average out all numerical multiple choice questions
             var questionAnswers = {};
             self.get("responses").each(function (response) {
                 var answers = response.get("answers");
@@ -105,6 +92,7 @@ window.Sprint = Backbone.Model.extend({
         }, null);
     },
 
+    //get the current length of the list of people
     setPossiblePeople: function() {
         var people = new PersonCollection();
         var self = this;
@@ -113,6 +101,8 @@ window.Sprint = Backbone.Model.extend({
         }, null);
     },
 
+    //when creating a sprint, save the ids of the active questions in the database
+    //necessary so that things don't break if a new question is created in the middle of a sprint
     pullSurveyQuestions: function() {
         var self = this;
         if (this.get("questions") === undefined) {
@@ -133,16 +123,19 @@ window.Sprint = Backbone.Model.extend({
         }
     },
 
+    //called when someone submits a survey
     addResponse: function(response) {
         this.get("responses").add(response);
     },
 
+    //at the end of a sprint, calculate winners of the sprint's superlative
     responsesToHistory: function() {
         var superlatives = this.get("superlatives");
         var people = new PersonCollection();
         var deferred = people.fetch().then(function() {
             var personDeferred;
             _.each(superlatives, function (superlative) {
+                //aggregate votes for each person
                 var votes = {};
                 _.each(superlative["responses"], function (person) {
                     if (person in votes) {
@@ -151,6 +144,7 @@ window.Sprint = Backbone.Model.extend({
                         votes[person] = 1;
                     }
                 });
+                //the winner is the person with the most votes
                 var winner;
                 var maxVotes = 0;
                 for (var key in votes) {
@@ -162,6 +156,7 @@ window.Sprint = Backbone.Model.extend({
                 var person = people.find(function (model) {
                     return model.get('name') == winner;
                 });
+                //create the history object and save it
                 var history = new History({person: person, superlative: superlative["name"]});
                 if (personDeferred === undefined) {
                     personDeferred = Backbone.sync("create", history);
@@ -177,6 +172,7 @@ window.Sprint = Backbone.Model.extend({
         return deferred;
     },
 
+    //ends a sprint
     deactivate: function() {
         this.set({completed: true});
         var self = this;
@@ -208,6 +204,7 @@ window.SprintCollection = Backbone.Collection.extend({
 
     model: Sprint,
 
+    //when people go to the survey, display is based on if a sprint is open
     getOpenSprint: function() {
         if (this.length>0) {
             var currentSprint = this.last();
