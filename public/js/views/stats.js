@@ -139,7 +139,7 @@ window.StatsView = Backbone.View.extend({
 
     //on changing the sprint select, show the details of the chosen sprint
     newSprintView: function() {
-        var sprint = this.sprints.find(function(sprint) {return sprint.get("sprintNumber") == $("#sprint-selection").val() });
+        var sprint = this.sprints.get($("#sprint-selection").val());
         var sprintView = new SprintView({model: sprint});
         $("#sprint-details").empty();
         $("#sprint-details").append(sprintView.el);

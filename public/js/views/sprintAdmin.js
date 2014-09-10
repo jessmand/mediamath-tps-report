@@ -27,7 +27,7 @@ window.SprintAdminView = Backbone.View.extend({
             lastEndDatePlus14 = new Date(this.sprints.last().get("endDate"));
             lastEndDatePlus14.setDate(lastEndDatePlus14.getDate()+14);
             lastEndDatePlus1 = new Date(this.sprints.last().get("endDate"));
-            lastEndDatePlus1.setDate(lastEndDatePlus14.getDate()+1);
+            lastEndDatePlus1.setDate(lastEndDatePlus1.getDate()+1);
         }
         $( "#end-date" ).datepicker({
             defaultDate: lastEndDatePlus14,
