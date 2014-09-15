@@ -97,7 +97,7 @@ window.Sprint = Backbone.Model.extend({
         var people = new PersonCollection();
         var self = this;
         return people.fetch().then(function() {
-            self.set({numberOfPeople:people.length});
+            self.set({numberOfPeople:people.where({responseRequired: true}).length});
         }, null);
     },
 

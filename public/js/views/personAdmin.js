@@ -26,7 +26,11 @@ window.PersonAdminView = Backbone.View.extend({
     //gets info from the form and saves a new person to the database
     //then makes a new row for them
     addPerson: function() {
-        var person = new Person({name:$("#new-person-name").val(), image:$("#new-person-picture").val()});
+        var person = new Person({
+            name:$("#new-person-name").val(),
+            image:$("#new-person-picture").val(),
+            responseRequired:$("#response-required").is(':checked')
+        });
         var self= this;
         person.save({},{success: function() {
             self.people.fetch().then(function() {
