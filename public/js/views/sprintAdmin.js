@@ -32,7 +32,7 @@ window.SprintAdminView = Backbone.View.extend({
         $( "#end-date" ).datepicker({
             defaultDate: lastEndDatePlus14,
             numberOfMonths: 2,
-            minDate: lastEndDatePlus1
+            minDate: new Date(Math.max.apply(null,[lastEndDatePlus1,today]))
         });
         return this;
     },
@@ -81,7 +81,8 @@ window.SprintAdminView = Backbone.View.extend({
     addSprint: function() {
         var options = {};
         options.endDate = $("#end-date").datepicker("getDate");
-        options.endDate.setHours(23,59,59,999);
+        //weird time zone thing, sorry this is hacky
+        options.endDate.setHours(19,59,59,999);
         options.superlatives = [];
         $(".new-sprint-superlative").each(function() {
             options.superlatives.push({name:$(this).val(),responses:[]});

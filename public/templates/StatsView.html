@@ -13,7 +13,7 @@
 <select id="sprint-selection" class="form-control">
 	<option selected disabled hidden value=''>Select a sprint to view...</option>
 	<% sprints.each(function(sprint) { %>
-	<option value="<%= sprint.get('id') %>">
+	<option value="<%= sprint.get('_id') %>">
 		<% var endDate = new Date(sprint.get("endDate")); %>
 		<%= sprint.get("sprintName") %> (Ended <%= endDate.getMonth()+1 %>/<%= endDate.getDate() %>/<%= endDate.getFullYear().toString().substring(2,4) %>)
 	</option>

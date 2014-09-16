@@ -17,6 +17,7 @@ window.QuestionAdminView = Backbone.View.extend({
             $("#new-question-type").val('');
             $(".question-choice-line:not(:first)").remove();
             $("#new-question-choice-1").val('');
+            $('#response-required').attr('checked','checked');
             $("#new-question-choices-group").hide();
         });
         return this;
